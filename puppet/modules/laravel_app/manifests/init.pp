@@ -15,15 +15,8 @@ class laravel_app
 		require => Exec['install composer'],
 	}
 
-	# exec { 'get laravel packages':
-	# 	command => "composer install'",
-	# 	cwd => '/var/www/',
-	# 	require => [Exec['global composer'], Package['git-core']],
-	# 	timeout => 900,
-	# }
-
 	exec { 'get laravel packages':
-		command => "/bin/sh -c 'cd /var/www/ && composer install'",
+		command => "/bin/sh -c 'cd /var/www/sims/ && composer install'",
 		require => [Exec['global composer'], Package['git-core']],
 		timeout => 900,
 	}
