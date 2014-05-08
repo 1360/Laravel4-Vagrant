@@ -1,16 +1,27 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-Vagrant::Config.run do |config|
+Vagrant.configure("2") do |config|
+
+    config.vm.provider "virtualbox" do |v, override|
+        override.vm.box = "precise32"
+        override.vm.box_url = "http://files.vagrantup.com/precise32.box"
+        v.customize [
+                                "modifyvm", :id,
+                                "--rtcuseutc", "on",
+                                "--memory", 2048,
+                                "--cpus", 1
+                                ]
+    end
+
     config.vm.define :laravel4 do |lv4_config|
-        lv4_config.vm.box = "precise32"
-        lv4_config.vm.box_url = "http://files.vagrantup.com/precise32.box"
-        lv4_config.vm.customize ["modifyvm", :id, "--rtcuseutc", "on"]
-        lv4_config.ssh.max_tries = 10
-        lv4_config.vm.forward_port 80, 8888
-        lv4_config.vm.forward_port 3306, 8889
-        lv4_config.vm.host_name = "laravel"
-  		lv4_config.vm.share_folder("www", "/var/www", "./www", :extra => 'dmode=777,fmode=777')
+
+        lv4_config.vm.network "forwarded_port", guest: 80, host:8888
+        lv4_config.vm.network "forwarded_port", guest: 88, host:8887
+        lv4_config.vm.network "forwarded_port", guest: 3306, host:8889
+
+        lv4_config.vm.hostname = "laravel"
+  		lv4_config.vm.synced_folder("www", "/var/www")
 
   		lv4_config.vm.provision :shell, :inline => "echo \"America/New_York\" | sudo tee /etc/timezone && dpkg-reconfigure --frontend noninteractive tzdata"
 
@@ -21,7 +32,8 @@ Vagrant::Config.run do |config|
             #puppet.options = "--verbose --debug"
             #puppet.options = "--verbose"
         end
-        
+
         lv4_config.vm.provision :shell, :path => "puppet/scripts/enable_remote_mysql_access.sh"
     end
+
 end

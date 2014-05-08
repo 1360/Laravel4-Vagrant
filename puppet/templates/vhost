@@ -1,12 +1,25 @@
 <VirtualHost *:80>
 	DocumentRoot /var/www/sims/public
-	
-	<Directory />
-		Options FollowSymLinks
-		AllowOverride None
+
+    SetEnv ENVIRONMENT localdev
+    SetEnv DEBUG true
+
+	<Directory /var/www/sims/public>
+		Options Indexes FollowSymLinks MultiViews
+		AllowOverride All
+		Order allow,deny
+		allow from all
 	</Directory>
-	
-	<Directory /var/www/>
+
+	ErrorLog /var/log/apache2/error.log
+	LogLevel warn
+	CustomLog /var/log/apache2/access.log combined
+</VirtualHost>
+
+<VirtualHost *:88>
+	DocumentRoot /var/www/learn/public
+
+	<Directory /var/www/learn/public>
 		Options Indexes FollowSymLinks MultiViews
 		AllowOverride All
 		Order allow,deny

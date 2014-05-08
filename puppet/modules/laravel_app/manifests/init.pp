@@ -1,4 +1,4 @@
-class laravel_app 
+class laravel_app
 {
 
 	package { 'git-core':
@@ -15,8 +15,22 @@ class laravel_app
 		require => Exec['install composer'],
 	}
 
-	exec { 'get laravel packages':
-		command => "/bin/sh -c 'cd /var/www/sims/ && composer install'",
+	exec { 'install sims project':
+		cwd => "/var/www/",
+		command => "cd sims/ && composer install",
+		onlyif => "git clone git@github.com:editure/sims.git",
+		require => [Exec['global composer'], Package['git-core']],
+		creates => "/var/www/sims/vendor/",
+		timeout => 900,
+	}
+
+	exec { 'update sims project':
+		cwd => "/var/www/sims/",
+		command => "composer update",
+		onlyif => [
+			"ls -al | grep -c vendor",
+			"git clone git@github.com:editure/sims.git"
+			],
 		require => [Exec['global composer'], Package['git-core']],
 		timeout => 900,
 	}
